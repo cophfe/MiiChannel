@@ -57,6 +57,8 @@ public class CastOverlay : MonoBehaviour
 
 	public void OnRender(ScriptableRenderContext ctx, Camera cam)
 	{
+		//idk how to get the scriptable render context other than through this, so this is how its happening I guess
+
 		if (cam == mainCamera && render)
 		{
 			Vector2 mousePos = Mouse.current.position.ReadValue();
@@ -79,11 +81,6 @@ public class CastOverlay : MonoBehaviour
 				
 				objectMaterial.SetTexture(overlayTextureName, overlays[writeIndex]);
 			}
-
-			
 		}
-		
-		
 	}
-
 }
