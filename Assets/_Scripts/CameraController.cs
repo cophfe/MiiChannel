@@ -5,9 +5,16 @@ using UnityEngine.InputSystem;
 
 public class CameraController : MonoBehaviour
 {
-	[SerializeField] float speed = 5;
-	[SerializeField] float drag = 1.0f;
+	public enum CameraMode
+	{
+		Edit,
+		Orbit,
+		Hover
+	}
 
+	[SerializeField] CameraMode mode = CameraMode.Hover;
+	[SerializeField] float hoverSpeed = 5;
+	[SerializeField] float hoverDrag = 1.0f;
 	bool moving = false;
 	Vector2 cameraMovement;
 	Vector2 velocity;
@@ -23,14 +30,29 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (moving)
+		switch (mode)
 		{
-			velocity += speed * cameraMovement * Time.deltaTime;
+			case CameraMode.Edit:
+				break;
+			case CameraMode.Orbit:
+				break;
+			case CameraMode.Hover:
+				transform.position = GetHoverPosition();
+				break;
+		}
+		
+	}
+
+	Vector3 GetHoverPosition()
+	{
+		if (moving)
+		{
+			velocity += hoverSpeed * cameraMovement * Time.deltaTime;
 		}
 
-		velocity -= velocity * drag * Time.deltaTime;
-		transform.position += new Vector3(velocity.x * velocityMultiplier, 0, velocity.y);
-    }
+		velocity -= velocity * hoverDrag * Time.deltaTime;
+		return transform.position + new Vector3(velocity.x * velocityMultiplier, 0, velocity.y);
+	}
 
 	public void OnDragCamera(InputAction.CallbackContext ctx)
 	{

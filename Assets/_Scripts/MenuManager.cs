@@ -8,7 +8,7 @@ public class MenuManager : MonoBehaviour
 {
 	[SerializeField] Animator rightClickMenu;
 	[SerializeField] RectTransform blockPanel;
-
+	public bool Interacting { get; private set; } = false;
 	// Start is called before the first frame update
 	void Start()
     {
@@ -23,7 +23,7 @@ public class MenuManager : MonoBehaviour
 			blockPanel.gameObject.SetActive(true);
 			rightClickMenu.gameObject.SetActive(true);
 			rightClickMenu.SetBool("Open", true);
-
+			Interacting = true;
 			Vector2 mousePos = Mouse.current.position.ReadValue();
 			rightClickMenu.GetComponent<RectTransform>().anchoredPosition = mousePos;
 		}
@@ -33,6 +33,7 @@ public class MenuManager : MonoBehaviour
 	{
 		blockPanel.gameObject.SetActive(false);
 		rightClickMenu.SetBool("Open", false);
+		Interacting = false;
 
 	}
 }

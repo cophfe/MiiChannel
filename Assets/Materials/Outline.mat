@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-7191091770655182936
+--- !u!114 &-4976181425614781178
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -20,8 +20,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ConstructOverlay
-  m_Shader: {fileID: 4800000, guid: a66109254ce0fbc41a4f53a5ca72b22e, type: 3}
+  m_Name: Outline
+  m_Shader: {fileID: 4800000, guid: 2ef8c752e322e134bb957af193e4b80e, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -68,6 +68,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _OutlineData:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -98,7 +102,6 @@ Material:
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DrawRadius: 0.05
     - _DstBlend: 0
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
@@ -117,11 +120,9 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseColor: {r: 0.6603774, g: 0.5513528, b: 0.5513528, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DrawColour: {r: 0.7924528, g: 0.10840159, b: 0.10840159, a: 1}
-    - _DrawPosition: {r: 0.18057212, g: 0.18909198, b: 0.038597688, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _ExampleName: {r: 0.25, g: 0.5, b: 0.5, a: 1}
+    - _OutlineColour: {r: 0.254717, g: 0.21506765, b: 0.21506765, a: 0.5058824}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []

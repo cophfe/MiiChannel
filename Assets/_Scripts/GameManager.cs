@@ -17,13 +17,21 @@ public class GameManager : MonoBehaviour
 		else
 		{
 			Instance = this;
+			Init();
 		}
 
+	}
+
+	private void Init()
+	{
 		MainCamera = Camera.main;
+		Selector = FindObjectOfType<Selector>();
+		UI = FindObjectOfType<MenuManager>();
 	}
 
 	public Camera MainCamera { get; private set; }
 	public Selector Selector { get; private set; }
+	public MenuManager UI { get; private set; }
 
 	public void RegisterSelector(Selector s)
 	{

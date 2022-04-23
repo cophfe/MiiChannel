@@ -1,22 +1,25 @@
-Shader "Custom/Stencil Override"
+Shader "Custom/Invisible"
 {
     Properties
     {
-		//[IntRange] _StencilValue("Stencil Value", Range(0,255)) = 255
+		[IntRange] _StencilValue("Stencil Value", Range(0,255)) = 1
     }
     SubShader
     {
         Tags { "RenderType"="Geometry - 1" }
-		ZWrite Off
-		Blend Zero One
+        //Tags { "RenderType"="Opaque" }
+		Cull Off 
+		ZWrite Off 
+		ZTest Off
+		Blend SrcAlpha OneMinusSrcAlpha
 
         Pass
         {
-			/*Stencil{
+			Stencil{
 				Ref[_StencilValue]
 				Comp Always
 				Pass Replace
-			}*/
+			}
 
             CGPROGRAM
             #pragma vertex vert
@@ -48,7 +51,7 @@ Shader "Custom/Stencil Override"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                return 0;
+                return float4(0,0,0,0);
             }
             ENDCG
         }

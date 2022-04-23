@@ -23,6 +23,7 @@ Shader "Custom/Selectable"
             struct v2f
             {
                 float4 vertex : SV_POSITION;
+				float3 worldPos : TEXCOORD0;
             };
 
 			int _ID;
@@ -31,13 +32,13 @@ Shader "Custom/Selectable"
             {
 				v2f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
-                return o;
+				o.worldPos = mul(unity_ObjectToWorld, v.vertex);
+				return o;
             }
 
 			fixed4 frag(v2f i) : SV_Target
 			{
-
-				return half4(_ID,1,1, 1);
+				return half4(i.worldPos.xyz, _ID);
             }
             ENDCG
         }
