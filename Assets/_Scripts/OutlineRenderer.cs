@@ -6,7 +6,7 @@ using UnityEngine.Rendering.Universal;
 
 public class OutlineRenderer : MonoBehaviour
 {
-	[SerializeField] float outlineResolutionScaling = 1.0f;
+	[SerializeField, Range(0.1f, 1)] float outlineResolutionScaling = 1.0f;
 	[SerializeField] Material outlineMaterial = null;
 
 	RenderTexture outlineTexture;

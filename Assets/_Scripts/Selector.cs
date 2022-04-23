@@ -46,7 +46,7 @@ public class Selector : MonoBehaviour
 	public void RegisterSelectable(GameObject selectable)
 	{
 		selectableObjects.Add(selectable);
-		Renderer[] renderers = selectable.GetComponentsInChildren<Renderer>();
+		Renderer[] renderers = selectable.GetComponentsInChildren<Renderer>(true);
 
 		if (renderers != null && renderers.Length > 0)
 		{

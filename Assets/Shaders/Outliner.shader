@@ -55,7 +55,7 @@ Shader "Custom/Outliner"
             }
 
 			//based on https://willweissman.wordpress.com/tutorials/shaders/unity-shaderlab-object-outlines/
-			//basically the same, except on urp
+			//super basic outline shader
 
 			fixed4 frag(v2f i) : SV_Target
 			{
@@ -67,7 +67,7 @@ Shader "Custom/Outliner"
 					 for (int j = 0; j < pixels; ++j)
 					 {
 						 //increase our output color by the pixels in the area
-						 outlinePower += tex2D(_OutlineData, i.uv + _MainTex_TexelSize * float2((k - pixels / 2.0), (j - pixels / 2.0))).r;
+						 outlinePower += tex2D(_OutlineData, i.uv + _MainTex_TexelSize * float2((k - (float)pixels / 2.0), (j - (float)pixels / 2.0))).r;
 					 }
 				}
 				outlinePower = saturate(outlinePower);
