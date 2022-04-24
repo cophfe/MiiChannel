@@ -5,14 +5,6 @@ using UnityEngine.InputSystem;
 
 public class CameraController : MonoBehaviour
 {
-	public enum CameraMode
-	{
-		Edit,
-		Orbit,
-		Hover
-	}
-
-	[SerializeField] CameraMode mode = CameraMode.Hover;
 	[SerializeField] float hoverSpeed = 5;
 	[SerializeField] float hoverDrag = 1.0f;
 	bool moving = false;
@@ -30,17 +22,7 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		switch (mode)
-		{
-			case CameraMode.Edit:
-				break;
-			case CameraMode.Orbit:
-				break;
-			case CameraMode.Hover:
-				transform.position = GetHoverPosition();
-				break;
-		}
-		
+		transform.position = GetHoverPosition();
 	}
 
 	Vector3 GetHoverPosition()

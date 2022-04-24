@@ -253,6 +253,78 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 290f57b34312fbf448d3b8ca6b6bd41d, type: 3}
   m_PrefabInstance: {fileID: 1748142616649652779}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &203540045
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 203540046}
+  - component: {fileID: 203540047}
+  - component: {fileID: 203540048}
+  m_Layer: 0
+  m_Name: Ragdoll Joint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &203540046
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203540045}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 471998570}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &203540047
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203540045}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!145 &203540048
+SpringJoint:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203540045}
+  m_ConnectedBody: {fileID: 0}
+  m_ConnectedArticulationBody: {fileID: 0}
+  m_Anchor: {x: 0, y: 0, z: 0}
+  m_AutoConfigureConnectedAnchor: 0
+  m_ConnectedAnchor: {x: 1.02, y: 0.027776346, z: -2.865797}
+  serializedVersion: 2
+  m_Spring: 50
+  m_Damper: 5
+  m_MinDistance: 0
+  m_MaxDistance: 0
+  m_Tolerance: 0.025
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_EnableCollision: 0
+  m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!1 &471998568
 GameObject:
   m_ObjectHideFlags: 0
@@ -372,8 +444,28 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 471998571}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnMouseDrag
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: f0bddf26-be6d-4fd1-9138-3cbc562362c9
     m_ActionName: Player/Delta Camera[/Mouse/delta]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 90fa903f-30f6-4ad2-a9c2-11063838781d
+    m_ActionName: Editor/Delta[/Mouse/delta]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 205bbd75-5f21-4e82-be80-efd8bbd0b152
+    m_ActionName: Editor/Click[/Mouse/leftButton]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -391,6 +483,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 729479914}
+  - {fileID: 203540046}
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -410,6 +503,8 @@ MonoBehaviour:
   outlineMaterial: {fileID: 2100000, guid: 533f6d90433d0f541811774c85457b5e, type: 2}
   selectedColour: {r: 0.6698113, g: 0.18640976, b: 0.18640976, a: 1}
   hovorColour: {r: 0.735849, g: 0.28114986, b: 0.28114986, a: 0.5058824}
+  ragdollDragStartDistance: 2
+  ragdollJoint: {fileID: 203540048}
 --- !u!114 &471998572
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1268,7 +1363,7 @@ Transform:
   m_GameObject: {fileID: 1342969906}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 20, y: 1, z: 62.06}
+  m_LocalScale: {x: 4, y: 1, z: 12.412}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
@@ -1762,9 +1857,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55664762a2d2f37439ebd1a339b3867b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mode: 2
-  hoverSpeed: 7
-  hoverDrag: 2
+  hoverSpeed: 0.1
+  hoverDrag: 7
 --- !u!114 &1695442482
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2031,7 +2125,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55664762a2d2f37439ebd1a339b3867b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mode: 2
   hoverSpeed: 5
   hoverDrag: 1
 --- !u!114 &2056281660
@@ -3042,6 +3135,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4179274765595308195}
   - component: {fileID: 1127199088305570481}
+  - component: {fileID: 1127199088305570482}
+  - component: {fileID: 1127199088305570483}
   m_Layer: 0
   m_Name: Ragdoll
   m_TagString: Untagged
@@ -3061,6 +3156,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dcf19a39d43df04ab373391459182d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1127199088305570482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1127199088305570480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87ecd31de4e161244bb31b002b5a58a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  torsoTransform: {fileID: 3167760921156359726}
+  getUpTime: 1
+--- !u!95 &1127199088305570483
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1127199088305570480}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 6793770d179eb204eac183a49f46f430, type: 3}
+  m_Controller: {fileID: 9100000, guid: 3b1b66959b943db44aee93246adc580f, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!137 &1160468707173214830
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 0

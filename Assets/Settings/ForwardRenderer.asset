@@ -95,7 +95,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0392e8b29a0408144b8728bcb40118ce, type: 3}
   m_Name: Outliner
   m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Active: 1
   settings:
     renderPassEvent: 300
     material: {fileID: 2100000, guid: 533f6d90433d0f541811774c85457b5e, type: 2}

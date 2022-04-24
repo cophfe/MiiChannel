@@ -16,7 +16,7 @@ Shader "Custom/Outliner"
         Pass
         {
 			Stencil{
-				Ref 1
+				Ref 200
 				Comp NotEqual
 			}
 
