@@ -45,11 +45,15 @@ public class OutlineRenderer : MonoBehaviour
 				outlineMaterial?.SetTexture("_OutlineData", outlineTexture);
 			}
 
+			
 			cam.targetTexture = outlineTexture;
+			Material skyBox = RenderSettings.skybox;
+			RenderSettings.skybox = null;
 			mainCameraAddition.SetRenderer(2);
 			UniversalRenderPipeline.RenderSingleCamera(ctx, cam);
 
 			cam.targetTexture = null;
+			RenderSettings.skybox = skyBox;
 			mainCameraAddition.SetRenderer(0);
 
 		}

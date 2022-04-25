@@ -9,9 +9,9 @@ Shader "Custom/Outliner"
     SubShader
     {
         Tags { "RenderType"="Opaque" }
-		/*Cull Off 
+		Cull Off 
 		ZWrite Off 
-		ZTest Always*/
+		ZTest Always
 
         Pass
         {
@@ -72,6 +72,9 @@ Shader "Custom/Outliner"
 				}
 				outlinePower = saturate(outlinePower);
 				outlinePower *= _OutlineColour.a;
+
+				if (outlinePower == 0)
+					discard;
 
                 return (1- outlinePower) * tex2D(_MainTex, i.uv) + outlinePower * _OutlineColour;
             }

@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour
 	int lastLayer;
 	int outlineLayer;
 	//Ragdoll drag
+	LineRenderer jointLine;
 	float dragDistance = 0;
 	bool draggingRagdoll = false;
 	Plane dragPlane = new Plane(Vector3.up, Vector3.zero);
@@ -41,6 +42,8 @@ public class PlayerController : MonoBehaviour
 		outlineMaterial.SetColor("_OutlineColour", hovorColour);
 
 		jointBody = ragdollJoint.GetComponent<Rigidbody>();
+		jointLine = ragdollJoint.GetComponent<LineRenderer>();
+		jointLine.enabled = false;
 	}
 
 	private void Update()
@@ -57,8 +60,10 @@ public class PlayerController : MonoBehaviour
 			if (dragPlane.Raycast(cameraRay, out float planeDistance))
 			{
 				ragdollJoint.transform.position = cameraRay.GetPoint(planeDistance);
+				Vector3 connectedPosWorld = ragdollJoint.connectedBody.transform.TransformPoint(ragdollJoint.connectedAnchor);
 				ragdollJoint.anchor = Vector3.zero;
-				Debug.DrawLine(ragdollJoint.transform.position, ragdollJoint.connectedBody.transform.TransformPoint(ragdollJoint.connectedAnchor), Color.red);
+				jointLine.SetPosition(1, ragdollJoint.transform.InverseTransformPoint(connectedPosWorld));
+				//Debug.DrawLine(ragdollJoint.transform.position, connectedPosWorld, Color.red);
 			}
 		}
 	}
@@ -97,11 +102,11 @@ public class PlayerController : MonoBehaviour
 					draggingRagdoll = true;
 
 					//turn into ragdoll and start dragging ragdoll with spring joint
-					ai.EnableRagdoll(true);
+					ai.EnableRagdoll(true, true);
 					draggedAI = ai;
-					draggedAI.DisallowRagdollCancel = true;
+					draggedAI.CanGetUp = false;
 
-					Collider[] colliders = selected.GetComponentsInChildren<Collider>();
+					Collider[] colliders = draggedAI.GetRagdollColliders();
 					//Get point on the closest ragdoll rigidbody from point on skinned mesh
 					float sqrDistance = Mathf.Infinity;
 					Collider closestCollider = null;
@@ -122,7 +127,7 @@ public class PlayerController : MonoBehaviour
 					}
 					
 					//when found close enough collider, create joint on ragdoll
-					if (sqrDistance != Mathf.Infinity)
+					if (sqrDistance != Mathf.Infinity && closestCollider.attachedRigidbody != null)
 					{
 						SetupSpringJoint(closestCollider.attachedRigidbody, rigidbodyPoint);
 					}
@@ -139,10 +144,11 @@ public class PlayerController : MonoBehaviour
 	{
 		dragPlane = new Plane(Vector3.up, position);
 		ragdollJoint.connectedBody = connected;
-		ragdollJoint.connectedAnchor = Vector3.zero;
-		//ragdollJoint.connectedAnchor = connected.transform.InverseTransformPoint(position);
+		//ragdollJoint.connectedAnchor = Vector3.zero;
+		ragdollJoint.connectedAnchor = connected.transform.InverseTransformPoint(position);
 		ragdollJoint.transform.position = position;
 		ragdollJoint.anchor = Vector3.zero;
+		jointLine.enabled = true;
 
 		storedDrag = connected.drag;
 		storedAngularDrag = connected.angularDrag;
@@ -156,8 +162,9 @@ public class PlayerController : MonoBehaviour
 		ragdollJoint.connectedBody.angularDrag = storedAngularDrag;
 		ragdollJoint.connectedBody = null;
 		dragDistance = 0;
+		jointLine.enabled = false;
 		if (draggedAI)
-			draggedAI.DisallowRagdollCancel = false;
+			draggedAI.CanGetUp = true;
 	}
 
 	void OnSelectedObject(GameObject gameObject, Vector3 position)

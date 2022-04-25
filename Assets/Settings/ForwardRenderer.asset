@@ -97,7 +97,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    renderPassEvent: 300
+    renderPassEvent: 400
     material: {fileID: 2100000, guid: 533f6d90433d0f541811774c85457b5e, type: 2}
     outlinedLayers:
       serializedVersion: 2

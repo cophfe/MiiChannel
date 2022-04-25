@@ -34,6 +34,7 @@ public class Selector : MonoBehaviour
 		selectorCam.targetTexture = selectTexture;
 		selectorCam.orthographic = true;
 		selectorCam.orthographicSize = mainCam.orthographicSize / Screen.height;
+		selectorCam.nearClipPlane = -1;
 		selectorCam.enabled = false;
 		var additionalData = gameObject.AddComponent<UniversalAdditionalCameraData>();
 		//this requires the second renderer to be the selector renderer
@@ -82,7 +83,10 @@ public class Selector : MonoBehaviour
 		var dataArray = request.GetData<Vector4>(0);
 		if (dataArray != null && dataArray.Length > 0)
 		{
-			Vector3 position = dataArray[0];
+			//idk what position in the pixel the sample is
+			//top left means [3], bottom left means [1], top right means [2], bottom right means [0]
+			//middle means none of them are better than each other
+			Vector3 position = dataArray[0]; 
 			if(selectCallback != null)
 			{
 				int instanceId = (int)dataArray[0].w;

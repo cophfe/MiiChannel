@@ -11,29 +11,80 @@ public class CameraController : MonoBehaviour
 	Vector2 cameraMovement;
 	Vector2 velocity;
 	float velocityMultiplier;
+	Camera attached;
 
 	// Start is called before the first frame update
 	void Start()
     {
-		Vector3 camForward = Camera.main.transform.forward;
+		attached = GetComponentInChildren<Camera>();
+		Vector3 camForward = attached.transform.forward;
 		velocityMultiplier = Vector3.Dot(camForward, Vector3.down);
 	}
 
     // Update is called once per frame
     void Update()
     {
-		transform.position = GetHoverPosition();
-	}
-
-	Vector3 GetHoverPosition()
-	{
 		if (moving)
 		{
 			velocity += hoverSpeed * cameraMovement * Time.deltaTime;
 		}
-
 		velocity -= velocity * hoverDrag * Time.deltaTime;
-		return transform.position + new Vector3(velocity.x * velocityMultiplier, 0, velocity.y);
+		
+		//ensure camera does not exit bounds
+		UpdateCollision();
+		
+		transform.position =  transform.position + new Vector3(velocity.x * velocityMultiplier, 0, velocity.y);
+	}
+
+	void UpdateCollision()
+	{
+		Plane groundPlane = new Plane(Vector3.up, 0);
+		Vector2 boundsMin = GameManager.Instance.BoundsMin;
+		Vector2 boundsMax = GameManager.Instance.BoundsMax;
+
+		Vector2 halfSize = new Vector2(attached.orthographicSize * attached.aspect, attached.orthographicSize);
+		Vector3 camUp = transform.up;
+		Vector3 camRight = transform.right;
+
+		Vector3 rayOffset = camUp * halfSize.y + camRight * halfSize.x;
+		Ray cameraMaxRay = new Ray(transform.position + rayOffset, transform.forward);
+		Ray cameraMinRay = new Ray(transform.position - rayOffset, transform.forward);
+		groundPlane.Raycast(cameraMaxRay, out float camMaxDist);
+		groundPlane.Raycast(cameraMinRay, out float camMinDist);
+		Vector3 camMax = cameraMaxRay.GetPoint(camMaxDist);
+		Vector3 camMin = cameraMinRay.GetPoint(camMinDist);
+
+		if (camMin.x > camMax.x)
+		{
+			Vector3 min = camMax;
+			camMax = camMin;
+			camMin = min;
+		}
+		
+		if (camMin.x < boundsMin.x)
+		{
+			transform.position += Vector3.right * (boundsMin.x - camMin.x);
+			velocity.x = 0;
+		}
+		else if (camMax.x > boundsMax.x)
+		{
+			transform.position -= Vector3.right * (camMax.x - boundsMax.x);
+			velocity.x = 0;
+		}
+
+		if (camMin.z < boundsMin.y)
+		{
+			transform.position += Vector3.forward * (boundsMin.y - camMin.z);
+			velocity.y = 0;
+		}
+		else if (camMax.z > boundsMax.y)
+		{
+			transform.position -= Vector3.forward * (camMax.z - boundsMax.y);
+			velocity.y = 0;
+		}
+
+
+
 	}
 
 	public void OnDragCamera(InputAction.CallbackContext ctx)
