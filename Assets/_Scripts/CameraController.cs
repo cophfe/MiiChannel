@@ -12,6 +12,7 @@ public class CameraController : MonoBehaviour
 	Vector2 velocity;
 	float velocityMultiplier;
 	Camera attached;
+	float targetOrthagraphicSize;
 
 	// Start is called before the first frame update
 	void Start()
@@ -19,6 +20,7 @@ public class CameraController : MonoBehaviour
 		attached = GetComponentInChildren<Camera>();
 		Vector3 camForward = attached.transform.forward;
 		velocityMultiplier = Vector3.Dot(camForward, Vector3.down);
+		targetOrthagraphicSize = attached.orthographicSize;
 	}
 
     // Update is called once per frame
@@ -29,8 +31,9 @@ public class CameraController : MonoBehaviour
 			velocity += hoverSpeed * cameraMovement * Time.deltaTime;
 		}
 		velocity -= velocity * hoverDrag * Time.deltaTime;
-		
+
 		//ensure camera does not exit bounds
+		attached.orthographicSize = targetOrthagraphicSize;
 		UpdateCollision();
 		
 		transform.position =  transform.position + new Vector3(velocity.x * velocityMultiplier, 0, velocity.y);
@@ -53,14 +56,33 @@ public class CameraController : MonoBehaviour
 		groundPlane.Raycast(cameraMinRay, out float camMinDist);
 		Vector3 camMax = cameraMaxRay.GetPoint(camMaxDist);
 		Vector3 camMin = cameraMinRay.GetPoint(camMinDist);
-
 		if (camMin.x > camMax.x)
 		{
 			Vector3 min = camMax;
 			camMax = camMin;
 			camMin = min;
 		}
-		
+
+		//restrict size so it cant be bigger than the bounds
+		if (camMax.x - camMin.x > boundsMax.x - boundsMin.x + 0.0001f)
+		{
+			float maxXSize = boundsMax.x - boundsMin.x;
+			float maxOrthographicSize = maxXSize * 0.5f / attached.aspect;
+			//size is too big, shrink orthagraphic size and try again
+			attached.orthographicSize = maxOrthographicSize;
+			UpdateCollision();
+			return;
+		}
+		if (camMax.z - camMin.z > boundsMax.y - boundsMin.y + 0.0001f)
+		{
+			float maxYSize = boundsMax.y - boundsMin.y;
+			float maxOrthographicSize = maxYSize * 0.5f;
+			//size is too big, shrink orthagraphic size and try again
+			attached.orthographicSize = maxOrthographicSize;
+			UpdateCollision();
+			return;
+		}
+
 		if (camMin.x < boundsMin.x)
 		{
 			transform.position += Vector3.right * (boundsMin.x - camMin.x);

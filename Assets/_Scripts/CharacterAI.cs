@@ -8,11 +8,23 @@ public class CharacterAI : MonoBehaviour
 	[SerializeField] Transform spineTransform;
 	[SerializeField] Transform headTransform;
 	//ai
-	float walkTimer;
-	bool walking = false;
-	Vector3 velocity = Vector3.zero; //note: locked on xy plane
-	Vector3 walkDirection;
+	enum State
+	{
+		Wandering,
+		WanderingContinuously,
+		Turning,
+		Waiting
+	}
+	State state = State.Waiting;
+	
+	float waitTimer = 0;
+	float currentSpeed = 0;
+	float currentRotateSpeed = 0;
+	Vector2 currentDirection;
+	Vector2 targetPosition;
 	float getUpTimer = 0;
+
+	int speedHash;
 	//
 	
 	//references
@@ -37,6 +49,7 @@ public class CharacterAI : MonoBehaviour
 		cController = GetComponent<CharacterController>();
 		cController.enabled = true;
 		ragdollBodies = bodyTransform.GetComponentsInChildren<Rigidbody>();
+		speedHash = Animator.StringToHash("Speed");
 		foreach (var body in ragdollBodies)
 		{
 			body.isKinematic = true;
@@ -46,9 +59,9 @@ public class CharacterAI : MonoBehaviour
 		{
 			collider.enabled = false;
 		}
-		
-		walkTimer = Random.Range(behaviour.waitTime - behaviour.waitTimeVariance, behaviour.waitTime + behaviour.waitTimeVariance);
-		
+
+		this.currentDirection = GetXZVec2(transform.forward);
+		ChooseMove();
 	}
 
     void Update()
@@ -64,19 +77,23 @@ public class CharacterAI : MonoBehaviour
 		}
 		else if (!ragdolling)
 		{
-			//get perpendicular to vector3.up facing in direction of mainForward
-			Vector3 mainForward = spineTransform.forward;
-			Vector3 facingDirection = Vector3.Cross(Vector3.Cross(mainForward, Vector3.up), Vector3.up).normalized;
-			Vector3 rightDirection = new Vector3(-facingDirection.z, facingDirection.y, facingDirection.x);
-
-			//Update animation
-			animator.SetFloat("Speed", Vector3.Dot(facingDirection, velocity));
-			animator.SetFloat("Strafe Speed", Vector3.Dot(rightDirection, velocity));
-
-			walkTimer -= Time.deltaTime;
-			if (walkTimer <= 0)
+			switch (state)
 			{
+				case State.Turning:
+					
+					break;
 
+				case State.Waiting:
+					waitTimer -= Time.deltaTime;
+					if (waitTimer <= 0)
+					{
+						ChooseMove();
+					}
+					break;
+
+				default:
+					Wander();
+					break;
 			}
 		}
 		else if (CanGetUp && ragdollBodies.Length > 0 && ragdollBodies[0].velocity.sqrMagnitude < 0.02f)
@@ -128,6 +145,143 @@ public class CharacterAI : MonoBehaviour
 				}
 			}
 		}
+	}
+
+	void ChooseMove()
+	{
+		float percent = Random.value;
+		if (percent < behaviour.wanderChance)
+		{
+			if (Random.value < behaviour.wanderContinuouslyChance)
+				state = State.WanderingContinuously;
+			else
+				state = State.Wandering;
+
+			//choose direction and distance to walk to
+			Vector2 randomDirection = Random.insideUnitCircle;
+			float distance = Random.Range(behaviour.wanderMinDistance, behaviour.wanderMaxDistance);
+			//calculate target position, restrict it to within the movement bounds
+			targetPosition = ConstrictToBounds(GetXZVec2(transform.position) + randomDirection * distance);
+		}
+		else if (percent < behaviour.wanderChance + behaviour.playRandomAnimationChance)
+		{
+			int anIndex = behaviour.GetRandomAnimationIndex();
+			if (anIndex > 0)
+			{
+				animator.SetTrigger("DoAnimation");
+				animator.SetInteger("AnimationIndex", anIndex + 1);
+				state = State.Waiting;
+				waitTimer = behaviour.randomAnimations[anIndex].time;
+			}
+		}
+		else if (percent < behaviour.wanderChance + behaviour.playRandomAnimationChance + behaviour.turnChance)
+		{
+			//turn left
+			if (Random.value > 0.5f)
+			{
+
+			}
+			//turn right
+			else
+			{
+				
+			}
+		}
+		else
+		{
+			state = State.Waiting;
+			waitTimer = Random.Range(behaviour.waitTime - behaviour.waitTimeVariance, behaviour.waitTime + behaviour.waitTimeVariance);
+		}
+	}
+
+	void Wander()
+	{
+		Vector3 targetDelta = GetVec3FromXZ(targetPosition) - transform.position;
+		float distance = targetDelta.magnitude;
+
+		if (distance < 0.13f)
+		{
+			if (state == State.Wandering)
+			{
+				//should already be at zero, but just in case.
+				currentSpeed = 0;
+				currentRotateSpeed = 0;
+				//finished walking.
+				waitTimer = Random.Range(behaviour.wanderWaitMin, behaviour.wanderWaitMax);
+				state = State.Waiting;
+				return;
+			}
+			else
+			{
+				currentRotateSpeed = 0;
+
+				if (Random.value < behaviour.wanderContinuouslyChance)
+					state = State.WanderingContinuously;
+				else
+					state = State.Wandering;
+
+				//choose direction and distance to walk to
+				Vector2 randomDirection = Random.insideUnitCircle;
+				float wanderDistance = Random.Range(behaviour.wanderMinDistance, behaviour.wanderMaxDistance);
+				//calculate target position, restrict it to within the movement bounds
+				targetPosition = ConstrictToBounds(GetXZVec2(transform.position) + randomDirection * wanderDistance);
+				return;
+			}
+		}
+		else
+		{
+			Vector2 targetDir = GetXZVec2(targetDelta / distance);
+
+			float moveSlowDown = 1;
+			if (state == State.Wandering)
+			{
+				moveSlowDown = 1 - Mathf.Clamp01((distance - 0.1f) / behaviour.slowDownDistance);
+				//apply exponential easing
+				moveSlowDown = 1 - (moveSlowDown == 0 ? 0 : Mathf.Pow(2, 10 * moveSlowDown - 10));
+			}
+
+			float rotateSlowDown = Mathf.Clamp(Vector2.Angle(currentDirection, targetDir)/30,0,1);
+			currentRotateSpeed = Mathf.Min(currentRotateSpeed + behaviour.rotateAcceleration * Time.deltaTime, behaviour.rotationSpeed);
+			//im pretty sure using the vector3.rotatetowards here wont change anything (no rotate funcitons exist for vector2s so this is easier)
+			currentDirection = Vector3.RotateTowards(currentDirection, targetDir, rotateSlowDown * currentRotateSpeed * Time.deltaTime, 0);
+
+			currentSpeed = Mathf.Min(currentSpeed + behaviour.acceleration * Time.deltaTime, behaviour.speed);
+			transform.forward = GetVec3FromXZ(currentDirection);
+			transform.position += GetVec3FromXZ(currentDirection * moveSlowDown * currentSpeed * Time.deltaTime);
+
+			//Update animation
+			Vector3 mainForward = spineTransform.forward;
+			Vector3 facingDirection = -Vector3.Cross(Vector3.Cross(mainForward, Vector3.up), Vector3.up).normalized;
+			Vector3 rightDirection = new Vector3(-facingDirection.z, facingDirection.y, facingDirection.x);
+
+			animator.SetFloat(speedHash, currentSpeed * behaviour.animationWalkSpeed * moveSlowDown);
+		}
+	}
+
+	Vector2 GetXZVec2(Vector3 vector)
+	{
+		return new Vector2(vector.x, vector.z);
+	}
+
+	Vector3 GetVec3FromXZ(Vector2 vector, float centreValue = 0)
+	{
+		return new Vector3(vector.x, centreValue, vector.y);
+	}
+
+	//Vector2 GetRandomValidPosition()
+	//{
+	//	//float radius = cController.radius;
+	//	//float x = Random.Range(GameManager.Instance.BoundsMin.x + radius, GameManager.Instance.BoundsMax.x - radius);
+	//	//float y = Random.Range(GameManager.Instance.BoundsMin.y + radius, GameManager.Instance.BoundsMax.y - radius);
+	//	//return new Vector2(x, y);
+	//}
+
+	Vector2 ConstrictToBounds(Vector2 boundsPosition)
+	{
+		float radius = cController.radius;
+		boundsPosition.x = Mathf.Clamp(boundsPosition.x, GameManager.Instance.BoundsMin.x + radius, GameManager.Instance.BoundsMax.x - radius);
+		boundsPosition.y = Mathf.Clamp(boundsPosition.y, GameManager.Instance.BoundsMin.y + radius, GameManager.Instance.BoundsMax.y - radius);
+		return boundsPosition;
 	}
 
 	bool TransitionOutOfRagdoll()
@@ -184,7 +338,9 @@ public class CharacterAI : MonoBehaviour
 		}
 		else
 		{
-			
+			state = State.Waiting;
+			waitTimer = behaviour.getUpWaitTime;
+
 			if (instantEnable)
 			{
 				transitionRigTransform = null;
