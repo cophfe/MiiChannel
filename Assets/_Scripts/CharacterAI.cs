@@ -21,7 +21,7 @@ public class CharacterAI : MonoBehaviour
 	float currentSpeed = 0;
 	float currentRotateSpeed = 0;
 	Vector2 currentDirection;
-	Vector2 targetPosition;
+	Vector2 target;
 	float getUpTimer = 0;
 
 	int speedHash;
@@ -33,7 +33,7 @@ public class CharacterAI : MonoBehaviour
 	Collider[] colliders;
 	Animator animator;
 	//transition out of ragdoll stuff
-	Transform transitionRigTransform = null;
+	[System.NonSerialized] public Transform transitionRigTransform = null;
 	StoredTransform spineData;
 	//
 	public bool CanGetUp { get => canGetUp; set { canGetUp = value; getUpTimer = 0; } }
@@ -77,10 +77,22 @@ public class CharacterAI : MonoBehaviour
 		}
 		else if (!ragdolling)
 		{
+			//bandaid solution
+			if (currentDirection.sqrMagnitude < 0.9f)
+				currentDirection = GetXZVec2(transform.forward);
+
 			switch (state)
 			{
 				case State.Turning:
-					
+					{
+						currentDirection = Vector3.RotateTowards(currentDirection, target, currentRotateSpeed * Time.deltaTime, 0);
+						transform.forward = GetVec3FromXZ(currentDirection);
+						if (Vector2.Dot(currentDirection, target) > 0.98f)
+						{
+							currentRotateSpeed = 0;
+							ChooseMove();
+						}
+					}
 					break;
 
 				case State.Waiting:
@@ -161,7 +173,7 @@ public class CharacterAI : MonoBehaviour
 			Vector2 randomDirection = Random.insideUnitCircle;
 			float distance = Random.Range(behaviour.wanderMinDistance, behaviour.wanderMaxDistance);
 			//calculate target position, restrict it to within the movement bounds
-			targetPosition = ConstrictToBounds(GetXZVec2(transform.position) + randomDirection * distance);
+			target = ConstrictToBounds(GetXZVec2(transform.position) + randomDirection * distance);
 		}
 		else if (percent < behaviour.wanderChance + behaviour.playRandomAnimationChance)
 		{
@@ -169,22 +181,27 @@ public class CharacterAI : MonoBehaviour
 			if (anIndex > 0)
 			{
 				animator.SetTrigger("DoAnimation");
-				animator.SetInteger("AnimationIndex", anIndex + 1);
+				animator.SetInteger("AnimationIndex", anIndex);
 				state = State.Waiting;
 				waitTimer = behaviour.randomAnimations[anIndex].time;
 			}
 		}
 		else if (percent < behaviour.wanderChance + behaviour.playRandomAnimationChance + behaviour.turnChance)
 		{
+			currentRotateSpeed = Mathf.Deg2Rad * 90.0f / behaviour.turnTime;
+			state = State.Turning;
+
 			//turn left
 			if (Random.value > 0.5f)
 			{
-
+				animator.SetTrigger("TurnLeft");
+				target = Vector2.Perpendicular(currentDirection);
 			}
 			//turn right
 			else
 			{
-				
+				animator.SetTrigger("TurnRight");
+				target = -Vector2.Perpendicular(currentDirection);
 			}
 		}
 		else
@@ -196,7 +213,7 @@ public class CharacterAI : MonoBehaviour
 
 	void Wander()
 	{
-		Vector3 targetDelta = GetVec3FromXZ(targetPosition) - transform.position;
+		Vector3 targetDelta = GetVec3FromXZ(target) - transform.position;
 		float distance = targetDelta.magnitude;
 
 		if (distance < 0.13f)
@@ -224,7 +241,7 @@ public class CharacterAI : MonoBehaviour
 				Vector2 randomDirection = Random.insideUnitCircle;
 				float wanderDistance = Random.Range(behaviour.wanderMinDistance, behaviour.wanderMaxDistance);
 				//calculate target position, restrict it to within the movement bounds
-				targetPosition = ConstrictToBounds(GetXZVec2(transform.position) + randomDirection * wanderDistance);
+				target = ConstrictToBounds(GetXZVec2(transform.position) + randomDirection * wanderDistance);
 				return;
 			}
 		}
@@ -325,6 +342,9 @@ public class CharacterAI : MonoBehaviour
 		getUpTimer = 0;
 		if (enable)
 		{
+			transitionRigTransform = null;
+			state = State.Waiting;
+
 			cController.enabled = false;
 			foreach (var body in ragdollBodies)
 			{
@@ -339,7 +359,6 @@ public class CharacterAI : MonoBehaviour
 		else
 		{
 			state = State.Waiting;
-			waitTimer = behaviour.getUpWaitTime;
 
 			if (instantEnable)
 			{
@@ -367,9 +386,15 @@ public class CharacterAI : MonoBehaviour
 			}
 
 			if (Vector3.Dot(spineTransform.forward, Vector3.up) > 0)
+			{
 				animator.Play("Base Layer.Stand Facing Up", 0, 0);
+				waitTimer = behaviour.getUpFromBackWaitTime;
+			}
 			else
+			{
 				animator.Play("Base Layer.Stand Facing Down", 0, 0);
+				waitTimer = behaviour.getUpFromFaceWaitTime;
+			}
 			cController.enabled = true;
 			animator.enabled = true;
 		}

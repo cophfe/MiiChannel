@@ -5,6 +5,9 @@ using UnityEngine;
 [DefaultExecutionOrder(-1)]
 public class GameManager : MonoBehaviour
 {
+	[SerializeField] Selector selector;
+	[SerializeField] PlayerController userController;
+	[SerializeField] MenuManager menuManager;
 	[SerializeField] Animator gettingUpFacingUp;
 	[SerializeField] Animator gettingUpFacingDown;
 	[SerializeField] Vector2 boundsSize = Vector2.one;
@@ -12,8 +15,9 @@ public class GameManager : MonoBehaviour
 	public Vector2 BoundsMin => boundsOffset - 0.5f * boundsSize;
 	public Vector2 BoundsMax => boundsOffset + 0.5f * boundsSize;
 	public Camera MainCamera { get; private set; }
-	public Selector Selector { get; private set; }
-	public MenuManager UI { get; private set; }
+	public Selector Selector => selector;
+	public MenuManager UI => menuManager;
+	public PlayerController UserController => userController;
 	public List<CharacterAI> CharacterAIList { get; private set; } = new List<CharacterAI>();
 
 	//the positions are set to the correct positions after the first update and are used for animation transitions by the character ais
@@ -38,15 +42,8 @@ public class GameManager : MonoBehaviour
 	private void Init()
 	{
 		MainCamera = Camera.main;
-		Selector = FindObjectOfType<Selector>();
-		UI = FindObjectOfType<MenuManager>();
 
 		StartCoroutine(InitAnimators());
-	}
-
-	public void RegisterSelector(Selector s)
-	{
-		Selector = s;
 	}
 
 	public void RegisterCharacter(CharacterAI c)

@@ -3,18 +3,27 @@ using UnityEngine;
 
 struct CharacterData
 {
-	public int shirtMaterialIndex;
-	public int beltMaterialIndex;
-	public int pantsMaterialIndex;
-	public int shoesMaterialIndex;
+	public int id;
 
+	MaterialModifierData shirtMaterialData;
+	MaterialModifierData beltMaterialData;
+	MaterialModifierData pantsMaterialData;
+	MaterialModifierData shoesMaterialData;
+
+	MaterialModifierData skinMaterialData;
 	public int facialHairIndex;
-	public int facialHairMaterialIndex;
-
+	MaterialModifierData facialHairMaterialData;
 	public int hairIndex;
-	public int hairMaterialIndex;
-
+	MaterialModifierData hairMaterialData;
 	public int hatIndex;
+	MaterialModifierData hatMaterialData;
+}
+
+struct MaterialModifierData
+{
+	public int materialIndex;
+	public Color32 baseColor;
+	public float shinyness;
 }
 
 struct HatData

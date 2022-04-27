@@ -14,6 +14,8 @@ public class PlayerController : MonoBehaviour
 	//Ragdoll Drag
 	[SerializeField] float ragdollDragStartDistance = 2;
 	[SerializeField] SpringJoint ragdollJoint;
+	//Select stuff
+	[SerializeField] float doubleTapTime = 0.3f;
 
 	//Layer Masks for outlining
 	int lastLayer;
@@ -31,6 +33,8 @@ public class PlayerController : MonoBehaviour
 	bool selecting = true;
 	Vector3 selectedPosition;
 	GameObject selected = null;
+	GameObject lastSelected = null;
+	float timeSinceLastSelected;
 
 	float storedDrag;
 	float storedAngularDrag;
@@ -46,8 +50,19 @@ public class PlayerController : MonoBehaviour
 		jointLine.enabled = false;
 	}
 
+	public GameObject GetSelected()
+	{
+		return selecting ? null : selected;
+	}
+
+	public GameObject GetLastSelected()
+	{
+		return lastSelected;
+	}
+
 	private void Update()
 	{
+		timeSinceLastSelected += Time.deltaTime;
 		if (selecting && !GameManager.Instance.UI.Interacting)
 		{
 			Vector2 mousePos = Mouse.current.position.ReadValue();
@@ -80,6 +95,7 @@ public class PlayerController : MonoBehaviour
 		else if(ctx.canceled)
 		{
 			mouseHeld = false;
+			dragDistance = 0;
 			if (draggingRagdoll && ragdollJoint.connectedBody != null)
 			{
 				ClearSpringJoint();
@@ -90,6 +106,7 @@ public class PlayerController : MonoBehaviour
 
 	public void OnMouseDrag(InputAction.CallbackContext ctx)
 	{
+		timeSinceLastSelected = 1000;
 		//if selected a character to drag
 		if (mouseHeld && !draggingRagdoll && !selecting && selected != null)
 		{
@@ -169,10 +186,14 @@ public class PlayerController : MonoBehaviour
 
 	void OnSelectedObject(GameObject gameObject, Vector3 position)
 	{
+		if (!selecting && gameObject)
+			Debug.Log(gameObject.name);
+		
 		if (selected != null)
 		{
 			RecursiveSetLayer(selected, lastLayer);
 		}
+		GameObject lastSelected = selected;
 		selected = gameObject;
 
 		if (gameObject)
@@ -187,15 +208,31 @@ public class PlayerController : MonoBehaviour
 				outlineMaterial.SetColor("_OutlineColour", selectedColour);
 				dragDistance = 0;
 				selectedPosition = position;
+				this.lastSelected = lastSelected;
+
+				//if meet conditions for double click on object, open menu
+				if (lastSelected == selected && timeSinceLastSelected < doubleTapTime)
+				{
+					GameManager.Instance.UI.OpenMenu();
+				}
+				timeSinceLastSelected = 0;
 			}
 		}
 		else if (!selecting)
 		{
 			outlineMaterial.SetColor("_OutlineColour", hovorColour);
 			selecting = true;
+
+			this.lastSelected = lastSelected;
+			//if meet conditions for double click on object, open menu
+			if (lastSelected == null && timeSinceLastSelected < doubleTapTime)
+			{
+				GameManager.Instance.UI.OpenMenu();
+			}
+			timeSinceLastSelected = 0;
 		}
-		
-		
+
+
 		//Debug.DrawLine(position, Camera.main.transform.position - new Vector3(0, 0.05f, 0));
 	}
 

@@ -114,7 +114,6 @@ public class Selector : MonoBehaviour
 
 	private void OnEnable()
 	{
-		GameManager.Instance.RegisterSelector(this);
 		RenderPipelineManager.beginCameraRendering += OnRender;
 	}
 	private void OnDisable()

@@ -15,13 +15,15 @@ public class AIBehaviour : ScriptableObject
 	public float wanderWaitMin = 0.5f;
 	public float wanderWaitMax = 1.5f;
 	public float animationWalkSpeed = 0.5f;
+	public float turnTime = 0.933f;
 	[Range(0,1)] public float wanderChance = 0.4f;
 	[Range(0,1)] public float playRandomAnimationChance = 0.2f;
 	[Range(0,1)] public float turnChance = 0.2f;
 	[Range(0,1)] public float wanderContinuouslyChance = 0.5f;
 	public float waitTime = 6;
 	public float waitTimeVariance = 4;
-	public float getUpWaitTime = 1.5f;
+	public float getUpFromBackWaitTime = 1.5f;
+	public float getUpFromFaceWaitTime = 1.5f;
 	public float getUpTime = 1;
 	public float getUpTransitionMoveSpeed = 0.3f;
 	public float getUpTransitionRotateSpeed = 2.0f;
@@ -66,29 +68,13 @@ public class AIBehaviour : ScriptableObject
 	public int GetRandomAnimationIndex()
 	{
 		float percent = Random.value;
-
-		//qwik performance
-		if (percent > 0.5f)
-		{
-			float currentPercent = 1;
-
-			for (int i = randomAnimations.Count - 1; i >= 0; i--)
-			{
-				if (currentPercent < percent)
-					return i;
-				currentPercent -= randomAnimations[i].weight * inverseTotalWeight;
-			}
-		}
-		else
-		{
-			float currentPercent = 0;
+		float currentPercent = 0;
 			
-			for (int i = 0; i < randomAnimations.Count; i++)
-			{
-				currentPercent += randomAnimations[i].weight * inverseTotalWeight;
-				if (currentPercent > percent)
-					return i;
-			}
+		for (int i = 0; i < randomAnimations.Count; i++)
+		{
+			currentPercent += randomAnimations[i].weight * inverseTotalWeight;
+			if (currentPercent > percent)
+				return i;
 		}
 		return -1;
 	}

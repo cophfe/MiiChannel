@@ -17,37 +17,39 @@ MonoBehaviour:
   rotateAcceleration: 5
   rotationSpeed: 20
   slowDownDistance: 2
-  wanderMaxDistance: 15
-  wanderMinDistance: 10
+  wanderMaxDistance: 10
+  wanderMinDistance: 4
   wanderWaitMin: 0.5
   wanderWaitMax: 1.5
   animationWalkSpeed: 1
-  wanderChance: 0.33
-  playRandomAnimationChance: 0.2
-  turnChance: 0.2
-  wanderContinuouslyChance: 0.5
-  waitTime: 2
+  turnTime: 1
+  wanderChance: 0.2
+  playRandomAnimationChance: 0.22
+  turnChance: 0.28
+  wanderContinuouslyChance: 0.16
+  waitTime: 4
   waitTimeVariance: 2
-  getUpWaitTime: 1.5
+  getUpFromBackWaitTime: 9
+  getUpFromFaceWaitTime: 3.5
   getUpTime: 1
   getUpTransitionMoveSpeed: 30
   getUpTransitionRotateSpeed: 11
   randomAnimations:
   - name: Backflip
-    weight: 3
-    time: 4.1
+    weight: 2
+    time: 6
   - name: Breakdancing
-    weight: 3
-    time: 1.6
+    weight: 2
+    time: 3
   - name: Look away
-    weight: 10
-    time: 2.3333
+    weight: 7
+    time: 3
   - name: Weight Shift
-    weight: 12
-    time: 9.433
+    weight: 7
+    time: 10
   - name: Sigh
     weight: 10
-    time: 3
+    time: 4
   - name: Headspin
     weight: 1
-    time: 13.83133
+    time: 15
