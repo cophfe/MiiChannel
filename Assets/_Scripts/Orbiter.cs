@@ -36,6 +36,11 @@ public class Orbiter : MonoBehaviour
 		defaultDirection = defaultDirection.normalized;
 	}
 
+	public void SetInputEnabled(bool enabled)
+	{
+		IsInputEnabled = enabled;
+	}
+
 	public void SetTarget(Transform target)
 	{
 		this.target = target;

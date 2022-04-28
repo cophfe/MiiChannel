@@ -5,31 +5,35 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 //Resizes character viewer rendertexture
-public class CharacterViewer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+public class CharacterViewer : MonoBehaviour
 {
 	[SerializeField] RenderTexture characterViewerTexture;
 	[SerializeField] RectTransform viewerPanel;
 	[SerializeField] Camera viewerCamera;
-	[SerializeField] Orbiter orbiter;
 
-	Vector2 panelSizeDelta = Vector2.zero;
+	Camera main;
+	Vector2 panelSize = Vector2.zero;
 	RawImage viewerPanelImage;
-	
+	Vector3[] worldCorners = new Vector3[4];
+
     // Start is called before the first frame update
     void Start()
     {
+		main = Camera.main;
 		viewerPanelImage = viewerPanel.GetComponent<RawImage>();
 	}
 
     // Update is called once per frame
     void Update()
     {
-        if (viewerPanel.sizeDelta != panelSizeDelta)
-		{
-			panelSizeDelta= viewerPanel.sizeDelta;
+		viewerPanel.GetWorldCorners(worldCorners);
+		Vector2 panelSize = main.WorldToScreenPoint(worldCorners[2]) - main.WorldToScreenPoint(worldCorners[0]);
 
-			RenderTexture newCharacterViewerTexture = new RenderTexture((int)panelSizeDelta.x, (int)panelSizeDelta.y, 24, characterViewerTexture.format, characterViewerTexture.mipmapCount);
+		if (panelSize != this.panelSize)
+		{
+			RenderTexture newCharacterViewerTexture = new RenderTexture((int)panelSize.x, (int)panelSize.y, 24, characterViewerTexture.format, characterViewerTexture.mipmapCount);
 			newCharacterViewerTexture.antiAliasing = characterViewerTexture.antiAliasing;
+			this.panelSize = panelSize;
 
 			characterViewerTexture.Release();
 			characterViewerTexture = newCharacterViewerTexture;
@@ -38,16 +42,6 @@ public class CharacterViewer : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 			
 		}
 
-	}
-
-	public void OnPointerDown(PointerEventData eventData)
-	{
-		orbiter.IsInputEnabled = true;
-	}
-
-	public void OnPointerUp(PointerEventData eventData)
-	{
-		orbiter.IsInputEnabled = false;
 	}
 }
 
