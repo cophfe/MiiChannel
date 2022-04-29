@@ -20,10 +20,31 @@ public class SelectorUI : MonoBehaviour
 		forward.onClick.AddListener(Iterate);
 	}
 
+	public void SetIndex(int index)
+	{
+		this.index = Mathf.Clamp(index, 0, count - 1);
+		indexText.text = index.ToString();
+		onChangeIndexCallback?.Invoke(index);
+	}
+
+	public int GetIndex()
+	{
+		return index;
+	}
+
 	//this way it can be used to index into any type of array
-	public void ConnectToSelector(int count, Action<int> onChangeIndex)
+	public void SetCount(int count)
 	{
 		this.count = count;
+	}
+
+	public int GetCount()
+	{
+		return count;
+	}
+
+	public void SetCallback(Action<int> onChangeIndex)
+	{
 		this.onChangeIndexCallback = onChangeIndex;
 	}
 

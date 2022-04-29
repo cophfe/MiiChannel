@@ -5240,6 +5240,7 @@ GameObject:
   - component: {fileID: 4344533883274343011}
   - component: {fileID: 4344533883274343021}
   - component: {fileID: 4344533883274343022}
+  - component: {fileID: 1141586580363381661}
   m_Layer: 0
   m_Name: AI Character
   m_TagString: Untagged
@@ -5307,6 +5308,26 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &1141586580363381661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4344533883274343010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecca6432b1c7de643b0ed14ed3ea2608, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characters: {fileID: 11400000, guid: 53b9dae8c8a0857458dba7fd12b90c91, type: 2}
+  materials: {fileID: 11400000, guid: 82273b06a0f1c484dbdda3c6ad22b52b, type: 2}
+  characterIndex: 0
+  skin: {fileID: 1156424938258315843}
+  hairParent: {fileID: 2596401046655216707}
+  facialHairParent: {fileID: 2596401046321731595}
+  hatParent: {fileID: 2596401046699890945}
+  clothesParent: {fileID: 2596401045562340525}
 --- !u!1 &4362761673034567288
 GameObject:
   m_ObjectHideFlags: 0

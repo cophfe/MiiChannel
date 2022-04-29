@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] SpringJoint ragdollJoint;
 	//Select stuff
 	[SerializeField] float doubleTapTime = 0.3f;
+	[SerializeField] float doubleTapCancelDistance = 2;
 
 	//Layer Masks for outlining
 	int lastLayer;
@@ -106,14 +107,16 @@ public class PlayerController : MonoBehaviour
 
 	public void OnMouseDrag(InputAction.CallbackContext ctx)
 	{
-		timeSinceLastSelected = 1000;
+		dragDistance += ctx.ReadValue<Vector2>().magnitude;
+		if (dragDistance > doubleTapCancelDistance)
+			timeSinceLastSelected = 1000;
+		
 		//if selected a character to drag
 		if (mouseHeld && !draggingRagdoll && !selecting && selected != null)
 		{
 			var ai = selected.GetComponent<CharacterAI>();
 			if (ai != null)
 			{
-				dragDistance += ctx.ReadValue<Vector2>().magnitude;
 				if (dragDistance > ragdollDragStartDistance)
 				{
 					draggingRagdoll = true;
@@ -186,8 +189,8 @@ public class PlayerController : MonoBehaviour
 
 	void OnSelectedObject(GameObject gameObject, Vector3 position)
 	{
-		if (!selecting && gameObject)
-			Debug.Log(gameObject.name);
+		//if (!selecting && gameObject)
+		//	Debug.Log(gameObject.name);
 		
 		if (selected != null)
 		{

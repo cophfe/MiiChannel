@@ -5,6 +5,8 @@ using UnityEngine;
 [DefaultExecutionOrder(-1)]
 public class GameManager : MonoBehaviour
 {
+	[SerializeField] SavedCharacters characters;
+	[SerializeField] CharacterVanity characterPrefab;
 	[SerializeField] Selector selector;
 	[SerializeField] PlayerController userController;
 	[SerializeField] MenuManager menuManager;
@@ -16,15 +18,20 @@ public class GameManager : MonoBehaviour
 	public Vector2 BoundsMax => boundsOffset + 0.5f * boundsSize;
 	public Camera MainCamera { get; private set; }
 	public Selector Selector => selector;
+	public SavedCharacters Saved => characters;
 	public MenuManager UI => menuManager;
 	public PlayerController UserController => userController;
-	public List<CharacterAI> CharacterAIList { get; private set; } = new List<CharacterAI>();
 
 	//the positions are set to the correct positions after the first update and are used for animation transitions by the character ais
 	public Transform StandUpFacingUpSpine { get; private set; }
 	public Transform StandUpFacingDownSpine { get; private set; }
 
 	public static GameManager Instance { get; protected set; } = null;
+	//please ignore these im lazy
+	public static int CurrentlyEditingIndex { get; set; } = 0;
+	public static bool CreatingNew { get; set; } = false;
+
+	CharacterVanity[] characterVanities;
 	protected void OnEnable()
 	{
 		if (Instance != null && Instance != this)
@@ -44,12 +51,18 @@ public class GameManager : MonoBehaviour
 		MainCamera = Camera.main;
 
 		StartCoroutine(InitAnimators());
-	}
 
-	public void RegisterCharacter(CharacterAI c)
-	{
-		if (!CharacterAIList.Contains(c))
-			CharacterAIList.Add(c);
+		//create characters from saved characters
+		Saved.LoadFromJson();
+		characterVanities = new CharacterVanity[characters.datas.Count];
+		for (int i = 0; i < characters.datas.Count; i++)
+		{
+			var character = Instantiate(characterPrefab.gameObject, null, true);
+			character.transform.position = new Vector3(characters.datas[i].position.x, 0, characters.datas[i].position.y);
+			characterVanities[i] = character.GetComponent<CharacterVanity>();
+			characterVanities[i].SetIndex(i);
+		}
+		
 	}
 
 	IEnumerator InitAnimators()
@@ -76,5 +89,27 @@ public class GameManager : MonoBehaviour
 		Gizmos.color = Color.red;
 		//bounds are in world space
 		Gizmos.DrawWireCube(new Vector3(boundsOffset.x, 5, boundsOffset.y), new Vector3(boundsSize.x, 10, boundsSize.y));
+	}
+
+	private void OnApplicationQuit()
+	{
+		if (Instance == this)
+		{
+			SaveCurrentPositions();
+		}
+	}
+
+	public void SaveCurrentPositions()
+	{
+		foreach (var vanity in characterVanities)
+		{
+			if (vanity != null && vanity.GetIndex() < Saved.datas.Count)
+			{
+				var cData = Saved.datas[vanity.GetIndex()];
+				cData.position = new Vector2(vanity.transform.position.x, vanity.transform.position.z);
+				Saved.datas[vanity.GetIndex()] = cData;
+			}
+		}
+		Saved.SaveToJson();
 	}
 }

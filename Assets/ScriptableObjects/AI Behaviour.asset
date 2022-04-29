@@ -23,17 +23,18 @@ MonoBehaviour:
   wanderWaitMax: 1.5
   animationWalkSpeed: 1
   turnTime: 1
-  wanderChance: 0.2
+  wanderChance: 0.48
   playRandomAnimationChance: 0.22
-  turnChance: 0.28
-  wanderContinuouslyChance: 0.16
+  turnChance: 0.17
+  wanderContinuouslyChance: 0.15
   waitTime: 4
-  waitTimeVariance: 2
+  waitTimeVariance: 3
   getUpFromBackWaitTime: 9
   getUpFromFaceWaitTime: 3.5
   getUpTime: 1
   getUpTransitionMoveSpeed: 30
   getUpTransitionRotateSpeed: 11
+  deathTime: 5
   randomAnimations:
   - name: Backflip
     weight: 2

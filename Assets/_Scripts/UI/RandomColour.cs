@@ -5,10 +5,10 @@ using UnityEngine.UI;
 
 public class RandomColour : MonoBehaviour
 {
-	[SerializeField] Image image;
+	[SerializeField] GetPicker color;
     public void RandomizeColor()
     {
         Color colour = new Color(Random.value, Random.value, Random.value);
-		image.color = colour;
+		color.SetColour(colour);
     }
 }

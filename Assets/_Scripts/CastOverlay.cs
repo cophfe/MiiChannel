@@ -8,24 +8,23 @@ using UnityEngine.InputSystem;
 //used to generate an overlay texture and draw it on models
 public class CastOverlay : MonoBehaviour
 {
-	[SerializeField] Collider castMesh;
+	[SerializeField] Camera mainCamera;
+	[SerializeField] Selector selector;
 	[SerializeField] Renderer meshRenderer;
 	[SerializeField] Texture2D mainTexture;
 	[SerializeField] Material objectMaterial;
 	[SerializeField] Material constructorMaterial;
-	[SerializeField] string overlayTextureName;
 
-	Camera mainCamera;
 	bool render = false;
+	bool selecting = false;
 	int positionId;
 	int lastTextureId;
 	RenderTexture[] overlays;
 	int readIndex = 0;
 	int writeIndex = 1;
-
+	Vector3 castPosition = Vector3.positiveInfinity;
 	void Start()
 	{
-		mainCamera = Camera.main;
 		overlays = new RenderTexture[2];
 		overlays[0] = new RenderTexture(mainTexture.width, mainTexture.height, 0);
 		overlays[1] = new RenderTexture(mainTexture.width, mainTexture.height, 0);
@@ -46,13 +45,38 @@ public class CastOverlay : MonoBehaviour
 	{
 		if (ctx.performed)
 		{
-			render = true;
+			selecting = true;
 		}
 		else if (ctx.canceled)
 		{
-			render = false;
+			selecting = false;
 		}
 		
+	}
+
+	private void Update()
+	{
+		if (selecting)
+		{
+			Vector2 mousePos = Mouse.current.position.ReadValue();
+			selector.GetSelectedObject(mousePos, OnSelect);
+		}
+	}
+
+	void OnSelect(GameObject gameObject, Vector3 position)
+	{
+		//gameobject will be null if no 'selectable' component attached
+
+		if (position != Vector3.negativeInfinity)
+		{
+			render = true;
+			castPosition = position;
+		}
+		else
+		{
+			render = false;
+			castPosition = Vector3.positiveInfinity;
+		}
 	}
 
 	public void OnRender(ScriptableRenderContext ctx, Camera cam)
@@ -61,26 +85,21 @@ public class CastOverlay : MonoBehaviour
 
 		if (cam == mainCamera && render)
 		{
-			Vector2 mousePos = Mouse.current.position.ReadValue();
-			Ray ray = mainCamera.ScreenPointToRay(mousePos);
-			if (castMesh.Raycast(ray, out var hit, Mathf.Infinity))
-			{
-				CommandBuffer renderBuffer = CommandBufferPool.Get();
-				renderBuffer.SetRenderTarget(overlays[writeIndex]);
-				renderBuffer.DrawRenderer(meshRenderer, constructorMaterial);
+			CommandBuffer renderBuffer = CommandBufferPool.Get();
+			renderBuffer.SetRenderTarget(overlays[writeIndex]);
+			renderBuffer.DrawRenderer(meshRenderer, constructorMaterial);
 
-				constructorMaterial.SetVector(positionId, hit.point);
-				constructorMaterial.SetTexture(lastTextureId, overlays[readIndex]);
+			constructorMaterial.SetVector(positionId, castPosition);
+			constructorMaterial.SetTexture(lastTextureId, overlays[readIndex]);
 
-				int cashe = readIndex;
-				readIndex = writeIndex;
-				writeIndex = cashe;
+			int cashe = readIndex;
+			readIndex = writeIndex;
+			writeIndex = cashe;
 
-				ctx.ExecuteCommandBuffer(renderBuffer);
-				renderBuffer.Release();
+			ctx.ExecuteCommandBuffer(renderBuffer);
+			renderBuffer.Release();
 				
-				objectMaterial.SetTexture(overlayTextureName, overlays[writeIndex]);
-			}
+			objectMaterial.SetTexture("_Overlay", overlays[writeIndex]);
 		}
 	}
 }

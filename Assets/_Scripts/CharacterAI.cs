@@ -23,6 +23,7 @@ public class CharacterAI : MonoBehaviour
 	Vector2 currentDirection;
 	Vector2 target;
 	float getUpTimer = 0;
+	bool dead;
 
 	int speedHash;
 	//
@@ -66,6 +67,9 @@ public class CharacterAI : MonoBehaviour
 
     void Update()
     {
+		if (dead)
+			return;
+
 		//if transition rig != null, is transitioning. if transition out of ragdoll returns true, is done transitioning
 		if (transitionRigTransform != null)
 		{
@@ -85,6 +89,7 @@ public class CharacterAI : MonoBehaviour
 			{
 				case State.Turning:
 					{
+						animator.SetFloat(speedHash, 0);
 						currentDirection = Vector3.RotateTowards(currentDirection, target, currentRotateSpeed * Time.deltaTime, 0);
 						transform.forward = GetVec3FromXZ(currentDirection);
 						if (Vector2.Dot(currentDirection, target) > 0.98f)
@@ -96,6 +101,7 @@ public class CharacterAI : MonoBehaviour
 					break;
 
 				case State.Waiting:
+					animator.SetFloat(speedHash, 0);
 					waitTimer -= Time.deltaTime;
 					if (waitTimer <= 0)
 					{
@@ -398,6 +404,19 @@ public class CharacterAI : MonoBehaviour
 			cController.enabled = true;
 			animator.enabled = true;
 		}
+	}
+
+	public void Kill()
+	{
+		animator.SetTrigger("Die");
+		dead = true;
+		StartCoroutine(OnDie());
+	}
+
+	IEnumerator OnDie()
+	{
+		yield return new WaitForSeconds(behaviour.deathTime);
+		Destroy(gameObject);
 	}
 }
 

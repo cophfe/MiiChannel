@@ -175,8 +175,7 @@ public class ColourPicker : MonoBehaviour
 		pickerPanel.gameObject.SetActive(true);
 		pickerPanel.SetBool("Open", true);
 		cancelButton.interactable = false;
-		UpdateColorVisuals();
-		UpdateHueVisuals();
+		Cancel();
 	}
 
 	public void Cancel()

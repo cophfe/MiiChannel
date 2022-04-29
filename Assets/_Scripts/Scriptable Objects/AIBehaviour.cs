@@ -27,6 +27,7 @@ public class AIBehaviour : ScriptableObject
 	public float getUpTime = 1;
 	public float getUpTransitionMoveSpeed = 0.3f;
 	public float getUpTransitionRotateSpeed = 2.0f;
+	public float deathTime = 5;
 
 	public List<AnimationInformation> randomAnimations;
 	float inverseTotalWeight;

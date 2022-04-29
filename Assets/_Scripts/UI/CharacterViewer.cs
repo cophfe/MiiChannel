@@ -29,7 +29,7 @@ public class CharacterViewer : MonoBehaviour
 		viewerPanel.GetWorldCorners(worldCorners);
 		Vector2 panelSize = main.WorldToScreenPoint(worldCorners[2]) - main.WorldToScreenPoint(worldCorners[0]);
 
-		if (panelSize != this.panelSize)
+		if (panelSize != this.panelSize && panelSize.x >= 1 && panelSize.y >= 1)
 		{
 			RenderTexture newCharacterViewerTexture = new RenderTexture((int)panelSize.x, (int)panelSize.y, 24, characterViewerTexture.format, characterViewerTexture.mipmapCount);
 			newCharacterViewerTexture.antiAliasing = characterViewerTexture.antiAliasing;

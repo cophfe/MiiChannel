@@ -1,33 +1,57 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-struct CharacterData
+[System.Serializable]
+public struct CharacterData
 {
-	public int id;
+	public string name;
+	public float height;
+	public Vector2 position;
 
-	MaterialModifierData shirtMaterialData;
-	MaterialModifierData beltMaterialData;
-	MaterialModifierData pantsMaterialData;
-	MaterialModifierData shoesMaterialData;
+	public MaterialModifierData shirtData;
+	public MaterialModifierData beltData;
+	public MaterialModifierData pantsData;
+	public MaterialModifierData shoesData;
 
-	MaterialModifierData skinMaterialData;
+	public MaterialModifierData skinData;
 	public int facialHairIndex;
-	MaterialModifierData facialHairMaterialData;
+	public MaterialModifierData facialHairData;
 	public int hairIndex;
-	MaterialModifierData hairMaterialData;
+	public MaterialModifierData hairData;
 	public int hatIndex;
-	MaterialModifierData hatMaterialData;
+	public MaterialModifierData hatData;
+
+	public CharacterData(Vector2 position)
+	{
+		this.name = "Joe";
+		height = 1.7f;
+		this.position = position;
+
+		hairIndex = 0;
+		facialHairIndex = 0;
+		hatIndex = 0;
+
+		shoesData = new MaterialModifierData(Color.cyan);
+		pantsData = new MaterialModifierData(Color.blue);
+		beltData = new MaterialModifierData(Color.gray);
+		shirtData = new MaterialModifierData(Color.magenta);
+		skinData = new MaterialModifierData(new Color(0.7529412f, 0.5333333f, 0.4078431f));
+		facialHairData = new MaterialModifierData(new Color(0.3882352f, 0.3411764f, 0.2705f), false);
+		hairData = new MaterialModifierData(new Color(0.3882352f, 0.3411764f, 0.2705f));
+		hatData = new MaterialModifierData(Color.white, false);
+	}
 }
 
-struct MaterialModifierData
+[System.Serializable]
+public struct MaterialModifierData
 {
+	public MaterialModifierData(Color color, bool on = true)
+	{
+		this.color = color;
+		this.on = on;
+		materialIndex = 0;
+	}
+	public bool on;
 	public int materialIndex;
-	public Color32 baseColor;
-	public float shinyness;
-}
-
-struct HatData
-{
-	public List<Material> hatMaterials;
-	
+	public Color32 color;
 }

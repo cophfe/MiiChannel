@@ -761,7 +761,7 @@
     },
     "m_Name": "OverlayMap",
     "m_DefaultReferenceName": "Texture2D_26a0e7dca6f0409aa86ddf06fae2db3f",
-    "m_OverrideReferenceName": "Overlay_26a0e7dca6f0409aa86ddf06fae2db3f",
+    "m_OverrideReferenceName": "_Overlay",
     "m_GeneratePropertyBlock": true,
     "m_Precision": 0,
     "overrideHLSLDeclaration": false,
